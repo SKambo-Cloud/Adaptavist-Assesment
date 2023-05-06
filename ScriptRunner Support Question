@@ -1,0 +1,46 @@
+Hello Suhanisa,
+
+Thank you for reaching out to the Adaptavist Support Team. I'm sorry to hear you're having trouble with your Script Listener. Let's take a further look into the issue and provide a script that meets your requirements.
+
+First, I'd like to address your current Listener code. It appears that you're using Java syntax within a ScriptRunner script, which should be written in the Groovy language. 
+
+This is likely causing your Jira instance to not respond correctly. To resolve the issue, let's rewrite your code in Groovy.
+
+To achieve your goals:
+
+1. Update the textField to display "Updated" when an issue is updated.
+2. Update a Select List custom field.
+
+Here's the updated Groovy code:
+-------------------------------------------------------------------------------------------------------------------------------
+
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.event.type.EventDispatchOption
+
+def issueManager = ComponentAccessor.issueManager
+def customFieldManager = ComponentAccessor.customFieldManager
+def user = ComponentAccessor.jiraAuthenticationContext.loggedInUser
+def textField = customFieldManager.getCustomFieldObject("customfield_10501")
+def selectListField = customFieldManager.getCustomFieldObject("customfield_XXXXX") // Replace XXXXX with the custom field ID for the Select List
+def issue = event.issue
+
+def optionsManager = ComponentAccessor.optionsManager
+def selectListValue = "Option Name" // Replace "Option Name" with the desired option for the Select List
+def fieldConfig = selectListField.getRelevantConfig(issue)
+def option = optionsManager.getOptions(fieldConfig).getOptionForValue(selectListValue, null)
+
+issue.setCustomFieldValue(textField, "Updated")
+issue.setCustomFieldValue(selectListField, option)
+issueManager.updateIssue(user, issue, EventDispatchOption.ISSUE_UPDATED, false)
+-------------------------------------------------------------------------------------------------------------------------------
+
+Please replace the custom field ID (`customfield_XXXXX`) with the appropriate ID for your Select List custom field and replace `"Option Name"` with the desired option value for the Select List.
+
+Additionally, ensure that your Script Listener configuration is set to trigger on the "Issue Updated" event.  You can refer to the documentation on Script Listeners here: https://docs.adaptavist.com/sr4js/latest/features/listeners
+
+Once you have updated your script and Listener configuration, it should function as expected. If you have any further issues or questions, please don't hesitate to reach out.
+
+
+Thanks,
+Satnam Kambo
+Adaptavist - ScriptRunner Support
