@@ -1,0 +1,25 @@
+// Field in Script Runner which will calculate value of 2 fields
+
+import com.atlassian.jira.component.ComponentAccessor
+
+def customFieldManager = ComponentAccessor.getCustomFieldManager()
+
+def fieldAList = customFieldManager.getCustomFieldObjectsByName("Field A")
+def fieldBList = customFieldManager.getCustomFieldObjectsByName("Field B")
+
+if (fieldAList.isEmpty() || fieldBList.isEmpty()) {
+    return null
+}
+
+def fieldA = fieldAList.first()
+def fieldB = fieldBList.first()
+
+def fieldAValue = issue.getCustomFieldValue(fieldA)
+def fieldBValue = issue.getCustomFieldValue(fieldB)
+
+if (fieldAValue == null || fieldBValue == null) {
+    return null
+}
+
+double result = ((Number) fieldAValue).doubleValue() + ((Number) fieldBValue).doubleValue() // Replace '*' with the desired operation, such as '+' or '/'
+return result
