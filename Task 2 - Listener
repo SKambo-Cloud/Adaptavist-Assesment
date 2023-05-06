@@ -1,0 +1,28 @@
+// Listener which updates the issue description with the issue's last comment.
+
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.event.type.EventDispatchOption
+import com.atlassian.jira.issue.Issue
+import com.atlassian.jira.issue.comments.CommentManager
+
+def issue = event.issue as Issue
+def commentManager = ComponentAccessor.getCommentManager()
+def user = ComponentAccessor.getJiraAuthenticationContext().getLoggedInUser()
+
+// Get the last comment
+def lastComment = commentManager.getLastComment(issue)
+
+if (lastComment) {
+    def issueManager = ComponentAccessor.getIssueManager()
+    def issueDescription = issue.getDescription()
+    def newDescription = "${lastComment.body}\n\n----\n\n${issueDescription}".toString()
+
+    // Create a mutable issue
+    def mutableIssue = issueManager.getIssueObject(issue.getId())
+    mutableIssue.setDescription(newDescription)
+
+    // Update issue and create change history
+    issueManager.updateIssue(user, mutableIssue, EventDispatchOption.ISSUE_UPDATED, false)
+} else {
+    log.warn("No comments found for issue: ${issue.getKey()}")
+}
