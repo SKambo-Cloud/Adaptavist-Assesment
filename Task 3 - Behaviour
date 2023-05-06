@@ -1,0 +1,23 @@
+// Behaviour which prefixes an issue's summary field to display "URGENT: " when the priority field value is "High" or "Highest".
+//If  priority field value is "Medium" or lower, remove the "URGENT: " 
+
+import com.atlassian.jira.component.ComponentAccessor
+import com.atlassian.jira.issue.priority.Priority
+
+def priorityField = getFieldById("priority")
+def summaryField = getFieldById("summary")
+
+def priority = priorityField.getValue() as Priority
+def currentSummary = summaryField.getValue() as String
+
+String urgentPrefix = "URGENT: "
+
+if (priority.name in ["High", "Highest"]) {
+    if (!currentSummary.startsWith(urgentPrefix)) {
+        summaryField.setFormValue(urgentPrefix + currentSummary)
+    }
+} else {
+    if (currentSummary.startsWith(urgentPrefix)) {
+        summaryField.setFormValue(currentSummary.replaceFirst(urgentPrefix, ""))
+    }
+}
